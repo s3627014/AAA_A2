@@ -11,6 +11,9 @@ import java.util.Random;
  */
 
 public class WallFollowerSolver implements MazeSolver {
+	/**
+	 * Instance Variables
+	 */
 	private ArrayList<Cell> visited = null;
 	private boolean solved = false;
 
@@ -62,7 +65,7 @@ public class WallFollowerSolver implements MazeSolver {
 		/** Local Variable Instantiation **/
 		Random rand = new Random();
 		/** Local Variable Initialisation **/
-		int[] directions = (maze.type == Maze.HEX ? new int[]{ Maze.EAST, Maze.NORTHEAST, Maze.WEST, Maze.NORTHWEST } : new int[]{ Maze.WEST, Maze.NORTH, Maze.EAST, Maze.SOUTH });
+		int[] directions = (maze.type == Maze.HEX ? new int[]{ Maze.WEST, Maze.NORTHWEST, Maze.EAST, Maze.NORTHEAST, Maze.SOUTHWEST, Maze.SOUTHEAST } : new int[]{ Maze.WEST, Maze.NORTH, Maze.EAST, Maze.SOUTH });
 		/** Implementation **/
 		for (int i = 0; i < directions.length; i++) {
 			System.out.printf("Checking Direction (%d) [Iteration %d]\n", directions[i], i);
@@ -126,9 +129,9 @@ public class WallFollowerSolver implements MazeSolver {
 		/** Local Variable Initialisation **/
 		int deltaR = cell.r + Maze.deltaR[direction], deltaC = cell.c + Maze.deltaC[direction];
 		/** Implementation **/
-		if (maze.type != maze.HEX && deltaR >= maze.sizeR || deltaR < 0 || deltaC >= maze.sizeC || deltaC < 0)
+		if (maze.type != maze.HEX && (deltaR >= maze.sizeR || deltaR < 0 || deltaC >= maze.sizeC || deltaC < 0))
 			return true;
-		else if (maze.type == maze.HEX && deltaR >= maze.sizeR || deltaR < 0 || deltaC > ((deltaC + 1)/2 + deltaC) || deltaC < 0)
+		else if (maze.type == maze.HEX && (deltaR >= maze.sizeR || deltaR < 0 || deltaC > ((deltaC + 1)/2 + deltaC) || deltaC < 0))
 			return true;
 		return false;
 	} // end of isOutOfBounds()

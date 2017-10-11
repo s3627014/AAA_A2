@@ -119,9 +119,9 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
         /** Local Variable Initialisation **/
 	    int deltaR = cell.r + Maze.deltaR[direction], deltaC = cell.c + Maze.deltaC[direction];
         /** Implementation **/
-	    if (maze.type != maze.HEX && deltaR >= maze.sizeR || deltaR < 0 || deltaC >= maze.sizeC || deltaC < 0)
+	    if (maze.type != maze.HEX && (deltaR >= maze.sizeR || deltaR < 0 || deltaC >= maze.sizeC || deltaC < 0))
 	        return true;
-	    else if (maze.type == maze.HEX && deltaR >= maze.sizeR || deltaR < 0 || deltaC >= ((maze.sizeC + 1)/2 + maze.sizeC) || deltaC < 0)
+	    else if (maze.type == maze.HEX && (deltaR >= maze.sizeR || deltaR < 0 || deltaC >= ((maze.sizeC + 1)/2 + maze.sizeC) || deltaC < 0))
             return true;
 	    return false;
     } // end of isOutOfBounds()
