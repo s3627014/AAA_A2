@@ -25,21 +25,34 @@ public class ModifiedPrimsGenerator implements MazeGenerator {
             directions.add(NORTHWEST);
             directions.add(SOUTHEAST);
             directions.add(SOUTHWEST);
+
         }
         Cell startingPoint;
-        if (maze.type == NORMAL) {
+      if (maze.type == NORMAL) {
             startingPoint = maze.map[random.nextInt(maze.sizeR)][random.nextInt(maze.sizeC)];
 
         } else {
-            //Temp fix to nullpointer issue. Not sure what happens but the starting point does not exists some times?
-            while (true) {
-                startingPoint = maze.map[random.nextInt(maze.sizeR)][random.nextInt((maze.sizeC + 1) / 2 + maze.sizeC)];
-                try {
-                    int test = startingPoint.c;
-                    break;
-                } catch (Exception e) { // ignore ArrayIndexOutOfBounds
-                }
+            int r = random.nextInt(maze.sizeR);
+            int rValue = (int) Math.ceil((double) r / 2) + maze.sizeC;
+            int c =0;
+
+
+
+            if(r==0){
+                c= random.nextInt(maze.sizeC);
             }
+            else {
+                if(r %2 ==0){
+                    c = rValue-1;
+                }
+                else{
+                    c = rValue-2;
+                }
+
+            }
+            System.out.println("r is " + r + "  c is " + c);
+            startingPoint = maze.map[r][c];
+
         }
         visited.add(startingPoint);
 
@@ -63,6 +76,7 @@ public class ModifiedPrimsGenerator implements MazeGenerator {
 
 
     // end of generateMaze()
+
     public void deleteWall(ArrayList<Integer> directions, Maze maze, Cell a, Cell b) {
         System.out.println("Deleting wall between " + a.r + "," + a.c + " and " + b.r + "," + b.c);
         int i = 0;
