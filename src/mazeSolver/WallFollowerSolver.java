@@ -1,10 +1,7 @@
 package mazeSolver;
 
 import maze.Maze;
-
-import maze.Maze;
 import maze.Cell;
-import maze.Wall;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -16,7 +13,11 @@ import java.util.Random;
 public class WallFollowerSolver implements MazeSolver {
 	private ArrayList<Cell> visited = null;
 	private boolean solved = false;
-	
+
+	/**
+	 * Using the wall follower algorithm solve a particularly generated maze instance.
+	 * @param maze The maze to solve
+	 */
 	@Override
 	public void solveMaze(Maze maze) {
 		/** Variable Instantiation **/
@@ -27,21 +28,19 @@ public class WallFollowerSolver implements MazeSolver {
 		/** Implementation **/
 		for (;;) {
 			// Check whether we're visiting a new cell
-			if (!visited.contains(currentPosition))
+			if (!visited.contains(currentPosition)) {
+				maze.drawFtPrt(currentPosition);
 				visited.add(currentPosition);
-			// Ensure we haven't reached the exit
+			}
+			// Check if we've reached the exit
 			if (currentPosition == maze.exit) {
-				System.out.printf("Found!\n");
 				solved = true;
 				break;
 			}
 			// Update current position or backtrack
 			if ((direction = nextDirection(maze, currentPosition)) != -1) {
-				// Draw
-				maze.drawFtPrt(currentPosition);
 				System.out.printf("CurrR (%d), CurrC (%d), Next Direction (%d)\n", currentPosition.r, currentPosition.c, direction);
 				currentPosition = maze.map[currentPosition.r + Maze.deltaR[direction]][currentPosition.c + Maze.deltaC[direction]];
-				// Reset backtrack
 				backtrack = 1;
 			} else if ((visited.size() - backtrack) != -1) {
 				System.out.printf("Backtrack\n");
@@ -55,29 +54,44 @@ public class WallFollowerSolver implements MazeSolver {
 
 	/**
 	 * Determine the next unvisited direction in the maze to progress with finding the exit in the maze
-	 * @param maze
-	 * @param currentPosition
-	 * @return
+	 * @param maze is the constructed maze we're solving
+	 * @param position is our current position in the maze
+	 * @return the next valid direction if one exists
 	 */
-	private int nextDirection(Maze maze, Cell currentPosition) {
+	private int nextDirection(Maze maze, Cell position) {
 		/** Local Variable Instantiation **/
 		Random rand = new Random();
 		/** Local Variable Initialisation **/
-		int[] directions = (maze.type == Maze.HEX ? new int[]{ Maze.EAST, Maze.NORTHEAST, Maze.WEST, Maze.NORTHWEST } : new int[]{ Maze.NORTH, Maze.EAST, Maze.WEST, Maze.SOUTH });
+		int[] directions = (maze.type == Maze.HEX ? new int[]{ Maze.EAST, Maze.NORTHEAST, Maze.WEST, Maze.NORTHWEST } : new int[]{ Maze.WEST, Maze.NORTH, Maze.EAST, Maze.SOUTH });
 		/** Implementation **/
 		for (int i = 0; i < directions.length; i++) {
 			System.out.printf("Checking Direction (%d) [Iteration %d]\n", directions[i], i);
-			if (wallIsDown(currentPosition, directions[i]) && !isOutOfBounds(maze, currentPosition, directions[i]) && isCellUnvisited(maze, currentPosition, directions[i]))
+			if (checkDirection(maze, position, directions, i))
 				return directions[i];
 		}
 		return -1;
 	} // end of nextDirection()
 
 	/**
+	 * Check the validity of the next direction in the maze base off of our current position.
+	 * @param maze is the constructed maze we're solving
+	 * @param position is our current position in the maze
+	 * @param directions are the directions we're travelling within the maze
+	 * @param direction is the singular direction we're checking
+	 * @return the evaluation whether a given direction is valid
+	 */
+	private boolean checkDirection(Maze maze, Cell position, int[] directions, int direction) {
+		/** Implementation **/
+		if (wallIsDown(position, directions[direction]) && !isOutOfBounds(maze, position, directions[direction]) && isCellUnvisited(maze, position, directions[direction]))
+			return true;
+		return false;
+	} // end of checkDirection()
+
+	/**
 	 * Ensure a wall exists it's knocked down in the next direction we're heading.
 	 * @param cell is our current position in the maze
 	 * @param direction is our next position in the maze
-	 * @return
+	 * @return the evaluation whether the wall is down
 	 */
 	private boolean wallIsDown(Cell cell, int direction) {
 		/** Implementation **/
@@ -90,9 +104,9 @@ public class WallFollowerSolver implements MazeSolver {
 	/**
 	 * Ensure the next cell hasn't already been visited when solving the maze.
 	 * @param maze is the constructed maze we're solving
-	 * @param cell is out current position in the maze
+	 * @param cell is our current position in the maze
 	 * @param direction is our next position in the maze
-	 * @return
+	 * @return the unvisited status of the next maze
 	 */
 	private boolean isCellUnvisited(Maze maze, Cell cell, int direction) {
 		/** Local Variable Initialisation **/
@@ -119,11 +133,19 @@ public class WallFollowerSolver implements MazeSolver {
 		return false;
 	} // end of isOutOfBounds()
 
+	/**
+	 * Check whether the maze has been solved.
+	 * @return the status of the maze
+	 */
 	@Override
 	public boolean isSolved() {
 		return solved;
 	} // end if isSolved()
-    
+
+	/**
+	 * Find the amount of cells explored in the maze.
+	 * @return the amount of explored cells
+	 */
 	@Override
 	public int cellsExplored() {
 		return visited == null ? 0 : visited.size();
