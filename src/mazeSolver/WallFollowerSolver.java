@@ -46,6 +46,9 @@ public class WallFollowerSolver implements MazeSolver {
 			} else if ((visited.size() - backtrack) != -1) {
 				System.out.printf("Backtrack\n");
 				currentPosition = visited.get(visited.size() - backtrack++);
+			} else {
+				System.out.printf("Standoff\n");
+				break;
 			}
 		}
 	} // end of solveMaze()
@@ -60,11 +63,11 @@ public class WallFollowerSolver implements MazeSolver {
 		/** Local Variable Instantiation **/
 		Random rand = new Random();
 		/** Local Variable Initialisation **/
-		int[] directions = (maze.type == Maze.HEX ? new int[]{ Maze.EAST, Maze.NORTHEAST, Maze.WEST, Maze.NORTHWEST } : new int[]{ Maze.NORTH, Maze.EAST, Maze.SOUTH, Maze.WEST });
+		int[] directions = (maze.type == Maze.HEX ? new int[]{ Maze.EAST, Maze.NORTHEAST, Maze.WEST, Maze.NORTHWEST } : new int[]{ Maze.NORTH, Maze.EAST, Maze.WEST, Maze.SOUTH });
 		/** Implementation **/
 		for (int i = 0; i < directions.length; i++) {
-			System.out.printf("Checking Direction (%d)\n", directions[i]);
-			if (wallExists(currentPosition, directions[i]) && !isOutOfBounds(maze, currentPosition, directions[i]) && isCellUnvisited(maze, currentPosition, directions[i]))
+			System.out.printf("Checking Direction (%d) [Iteration %d]\n", directions[i], i);
+			if (wallIsDown(currentPosition, directions[i]) && !isOutOfBounds(maze, currentPosition, directions[i]) && isCellUnvisited(maze, currentPosition, directions[i]))
 				return directions[i];
 		}
 		return -1;
@@ -76,13 +79,13 @@ public class WallFollowerSolver implements MazeSolver {
 	 * @param direction is our next position in the maze
 	 * @return
 	 */
-	private boolean wallExists(Cell cell, int direction) {
+	private boolean wallIsDown(Cell cell, int direction) {
 		/** Implementation **/
 		// Ensure the wall exists and isn't present
 		if (cell.wall[direction] != null && cell.wall[direction].present == false)
 			return true;
 		return false;
-	} // end of wallExists()
+	} // end of wallIsDown()
 
 	/**
 	 * Ensure the next cell hasn't already been visited when solving the maze.
