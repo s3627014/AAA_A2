@@ -16,13 +16,14 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
         Random rand = new Random();
         /** Local Variable Initialisation **/
         int row = rand.nextInt(maze.sizeR), col = rand.nextInt(maze.sizeC);
+        int rValue = (int) Math.ceil((double) row / 2) + maze.sizeC;
         //int row = rand.nextInt(maze.sizeR), col = rand.nextInt((maze.type == Maze.HEX ? (maze.sizeC + 1) / 2 + maze.sizeC : maze.sizeC));
         /** Implementation **/
-        System.out.printf("Start Col: %d, Hex Col: %d\n", col, hexStartCol(row, col));
+        System.out.printf("Start Col: %d, Hex Col: %d\n", col, hexStartCol(row, col,rValue));
         if (maze.type != Maze.HEX)
             recursiveBacktrack(maze, maze.map[row][col], row, col, new ArrayDeque<Integer>());
         else
-            recursiveBacktrack(maze, maze.map[row][(col = hexStartCol(row, col))], row, col, new ArrayDeque<Integer>());
+            recursiveBacktrack(maze, maze.map[row][(col = hexStartCol(row, col, rValue))], row, col, new ArrayDeque<Integer>());
 	} // end of generateMaze()
 
     /**
@@ -31,11 +32,17 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
      * @param col is the pseudorandom generated starting col
      * @return the appropriate starting col
      */
-    private int hexStartCol(int row, int col) {
-	    if (row == 0)
-	        return (col + 1)/2 + col;
+    private int hexStartCol(int row, int col,int rValue ) {
+        if (row == 0)
+	        return col;
 	    else
-            return (col == 0 ? (int)Math.ceil((double)row/2) : (col + 1)/2) + col;
+	        if(row %2 ==0){
+                return rValue-1;
+            }
+            else{
+
+                return rValue-2;
+            }
     }
 
     /**
