@@ -4,6 +4,8 @@ import maze.Maze;
 import maze.Cell;
 import maze.Wall;
 
+import java.util.Deque;
+import java.util.ArrayDeque;
 import java.util.Random;
 
 public class RecursiveBacktrackerGenerator implements MazeGenerator {
@@ -14,9 +16,27 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
         Random rand = new Random();
         /** Local Variable Initialisation **/
         int row = rand.nextInt(maze.sizeR), col = rand.nextInt(maze.sizeC);
+        //int row = rand.nextInt(maze.sizeR), col = rand.nextInt((maze.type == Maze.HEX ? (maze.sizeC + 1) / 2 + maze.sizeC : maze.sizeC));
         /** Implementation **/
-        recursiveBacktrack(maze, maze.map[row][col], row, col);
+        System.out.printf("Start Col: %d, Hex Col: %d\n", col, hexStartCol(row, col));
+        if (maze.type != Maze.HEX)
+            recursiveBacktrack(maze, maze.map[row][col], row, col, new ArrayDeque<Integer>());
+        else
+            recursiveBacktrack(maze, maze.map[row][(col = hexStartCol(row, col))], row, col, new ArrayDeque<Integer>());
 	} // end of generateMaze()
+
+    /**
+     * Ensure the starting column is contained within the hex maze accordingly as the row increases.
+     * @param row is the pseudorandom generated starting row
+     * @param col is the pseudorandom generated starting col
+     * @return the appropriate starting col
+     */
+    private int hexStartCol(int row, int col) {
+	    if (row == 0)
+	        return (col + 1)/2 + col;
+	    else
+            return (col == 0 ? (int)Math.ceil((double)row/2) : (col + 1)/2) + col;
+    }
 
     /**
      * Recursively pave a pseudorandom generated pathway through the maze using Depth First Search (DFS) algorithm.
@@ -25,16 +45,21 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
      * @param row holds what row in the maze the neighbour is at
      * @param col holds what column in the maze the neighbour is at
      */
-    private void recursiveBacktrack(Maze maze, Cell neighbour, int row, int col) {
+    private void recursiveBacktrack(Maze maze, Cell neighbour, int row, int col, Deque<Integer> directions) {
         /** Local Variable Initialisation **/
         int direction;
         /** Implementation **/
-        // Get a direction of an unvisited cell if any are available
-        while ((direction = nextDirection(maze, neighbour)) != -1) {
-            // Knock down the wall towards the unvisited cell
+        System.out.printf("Row: %d, Col: %d\n", row, col);
+        if ((direction = nextDirection(maze, neighbour)) != -1) {
+            directions.push(direction);
+            System.out.printf("Backtrack: r(%d) + dR(%d) = %d, c(%d) + dC(%d) = %d\n", row, Maze.deltaR[direction], row + Maze.deltaR[direction], col, Maze.deltaC[direction], col + Maze.deltaC[direction]);
             neighbour.wall[direction].present = false;
             recursiveBacktrack(maze, (neighbour = maze.map[row + Maze.deltaR[direction]][col + Maze.deltaC[direction]]),
-                    neighbour.r, neighbour.c);
+                    neighbour.r, neighbour.c, directions);
+        } else if (directions.size() != 0) {
+            direction = directions.pop();
+            recursiveBacktrack(maze, (neighbour = maze.map[row + Maze.deltaR[Maze.oppoDir[direction]]][col + Maze.deltaC[Maze.oppoDir[direction]]]),
+                    neighbour.r, neighbour.c, directions);
         }
     } // end of recursiveBacktrack()
 
@@ -48,15 +73,17 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
         /** Local Variable Instantiation **/
         Random rand = new Random();
         /** Local Variable Initialisation **/
-        int value = rand.nextInt(Maze.NUM_DIR);
+        int[] directions = (maze.type == Maze.HEX ? new int[]{ Maze.NORTHEAST, Maze.EAST, Maze.SOUTHEAST, Maze.SOUTHWEST, Maze.WEST, Maze.NORTHWEST } : new int[]{ Maze.NORTH, Maze.EAST, Maze.SOUTH, Maze.WEST });
+        int value = rand.nextInt(directions.length);
         /** Implementation **/
         // Check all walls to determine whether there is an unvisited neighbour starting from random
-        for (int i = value; i < Maze.NUM_DIR; i++)
-            if (cell.wall[i] != null && !isOutOfBounds(maze, cell, i) && isCellUnvisited(maze, cell, i))
-                return i;
-        for (int i = 0; i < value; i++)
-            if (cell.wall[i] != null && !isOutOfBounds(maze, cell, i) && isCellUnvisited(maze, cell, i))
-                return i;
+        for (int i = value; i < directions.length; i++) {
+            System.out.printf("Direction: %d\n", i);
+            if (cell.wall[directions[i]] != null && !isOutOfBounds(maze, cell, directions[i]) && isCellUnvisited(maze, cell, directions[i]))
+                return directions[i];
+         }for (int i = 0; i < value; i++)
+            if (cell.wall[directions[i]] != null && !isOutOfBounds(maze, cell, directions[i]) && isCellUnvisited(maze, cell, directions[i]))
+                return directions[i];
         return -1;
     } // end of nextDirection()
 
@@ -68,9 +95,14 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
      * @return whether the cell is unvisited
      */
     private boolean isCellUnvisited(Maze maze, Cell cell, int direction) {
+        /** Local Variable Initialisation **/
+        Cell neighbourCell;
         /** Implementation **/
+        // Ensure the neighbouring cell isn't null
+        if ((neighbourCell = maze.map[cell.r + Maze.deltaR[direction]][cell.c + Maze.deltaC[direction]]) == null)
+            return false;
 	    // Check whether a neighbouring cell is unvisited
-        for (Wall wall : maze.map[cell.r + Maze.deltaR[direction]][cell.c + Maze.deltaC[direction]].wall)
+        for (Wall wall : neighbourCell.wall)
             if (wall != null && wall.present == false)
                 return false;
         return true;
@@ -87,8 +119,10 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
         /** Local Variable Initialisation **/
 	    int deltaR = cell.r + Maze.deltaR[direction], deltaC = cell.c + Maze.deltaC[direction];
         /** Implementation **/
-	    if (deltaR >= maze.sizeR || deltaR < 0 || deltaC >= maze.sizeC || deltaC < 0)
+	    if (maze.type != maze.HEX && deltaR >= maze.sizeR || deltaR < 0 || deltaC >= maze.sizeC || deltaC < 0)
 	        return true;
+	    else if (maze.type == maze.HEX && deltaR >= maze.sizeR || deltaR < 0 || deltaC >= ((maze.sizeC + 1)/2 + maze.sizeC) || deltaC < 0)
+            return true;
 	    return false;
     } // end of isOutOfBounds()
 
