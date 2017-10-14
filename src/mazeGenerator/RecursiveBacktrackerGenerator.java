@@ -4,6 +4,7 @@ import maze.Maze;
 import maze.Cell;
 import maze.Wall;
 
+import java.io.IOException;
 import java.util.Deque;
 import java.util.ArrayDeque;
 import java.util.Random;
@@ -48,6 +49,9 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
     private void recursiveBacktrack(Maze maze, Cell neighbour, int row, int col, Deque<Integer> directions) {
         /** Local Variable Initialisation **/
         int direction;
+        if(neighbour.tunnelTo !=null){
+        neighbour = neighbour.tunnelTo;
+        }
         /** Implementation **/
         System.out.printf("Row: %d, Col: %d\n", row, col);
         if ((direction = nextDirection(maze, neighbour)) != -1) {
@@ -125,5 +129,12 @@ public class RecursiveBacktrackerGenerator implements MazeGenerator {
             return true;
 	    return false;
     } // end of isOutOfBounds()
+    public void stop() {
+        try {
+            System.in.read();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
+    }
 } // end of class RecursiveBacktrackerGenerator
