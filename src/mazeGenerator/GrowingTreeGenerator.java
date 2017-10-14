@@ -26,8 +26,6 @@ public class GrowingTreeGenerator implements MazeGenerator {
 			directions.add(NORTHWEST);
 			directions.add(SOUTHEAST);
 			directions.add(SOUTHWEST);
-			directions.remove(NORTH);
-			directions.remove(SOUTH);
 		}
 		Cell startingPoint;
 		if (maze.type == NORMAL) {
