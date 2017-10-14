@@ -3,6 +3,7 @@ package mazeSolver;
 import maze.Maze;
 import maze.Cell;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -13,7 +14,7 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
     /**
      * Instance Variables
      */
-    private ArrayList<Cell> entranceVisited = null, exitVisited = null;
+    private List<Cell> entranceVisited = null, exitVisited = null;
     private boolean solved = false;
 
     /**
@@ -25,8 +26,8 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
         /** Variable Instantiation **/
         entranceVisited = new ArrayList<Cell>();
         exitVisited = new ArrayList<Cell>();
-		/** Implementation **/
-		biDirectionalBacktrack(maze, maze.entrance, 1, maze.exit, 1);
+        /** Implementation **/
+        biDirectionalBacktrack(maze, maze.entrance, 1, maze.exit, 1);
 	} // end of solveMaze()
 
     /**
@@ -91,7 +92,7 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
      * @param visited is the container of currently visited cells
      * @return the next valid direction if one exists
      */
-    private int nextDirection(Maze maze, Cell position, ArrayList<Cell> visited) {
+    private int nextDirection(Maze maze, Cell position, List<Cell> visited) {
         /** Local Variable Instantiation **/
         Random rand = new Random();
         /** Local Variable Initialisation **/
@@ -114,7 +115,7 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
      * @param visited is the container of currently visited cells
      * @return the evaluation whether a given direction is valid
      */
-    private boolean checkDirection(Maze maze, Cell position, int[] directions, int direction, ArrayList<Cell> visited) {
+    private boolean checkDirection(Maze maze, Cell position, int[] directions, int direction, List<Cell> visited) {
         /** Implementation **/
         if (wallIsDown(position, directions[direction]) && !isOutOfBounds(maze, position, directions[direction]) && isCellUnvisited(maze, position, directions[direction], visited))
             return true;
@@ -143,7 +144,7 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
      * @param visited is the container of currently visited cells
      * @return the unvisited status of the next maze
      */
-    private boolean isCellUnvisited(Maze maze, Cell cell, int direction, ArrayList<Cell> visited) {
+    private boolean isCellUnvisited(Maze maze, Cell cell, int direction, List<Cell> visited) {
         /** Local Variable Initialisation **/
         Cell neighbour = maze.map[cell.r + Maze.deltaR[direction]][cell.c + Maze.deltaC[direction]];
         /** Implementation **/

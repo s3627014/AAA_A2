@@ -3,6 +3,7 @@ package mazeSolver;
 import maze.Maze;
 import maze.Cell;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -14,7 +15,7 @@ public class WallFollowerSolver implements MazeSolver {
 	/**
 	 * Instance Variables
 	 */
-	private ArrayList<Cell> visited = null;
+	private List<Cell> visited = null;
 	private boolean solved = false;
 
 	/**
