@@ -48,7 +48,7 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
             entranceVisited.add(fromEntrance);
         }
         // Check whether we're visiting a new cell from the exit
-        if (!entranceVisited.contains(fromEntrance)) {
+        if (!exitVisited.contains(fromExit)) {
             maze.drawFtPrt(fromExit);
             exitVisited.add(fromExit);
         }
@@ -81,7 +81,7 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
             System.out.printf("Exit Standoff\n");
             return;
         }
-        // Reoccurence
+        // Recursive Call
         biDirectionalBacktrack(maze, fromEntrance, entranceBacktrack, fromExit, exitBacktrack);
 	}
 
@@ -96,9 +96,15 @@ public class BiDirectionalRecursiveBacktrackerSolver implements MazeSolver {
         /** Local Variable Instantiation **/
         Random rand = new Random();
         /** Local Variable Initialisation **/
-        int[] directions = (maze.type == Maze.HEX ? new int[]{ Maze.WEST, Maze.NORTHWEST, Maze.EAST, Maze.NORTHEAST, Maze.SOUTHWEST, Maze.SOUTHEAST } : new int[]{ Maze.WEST, Maze.NORTH, Maze.EAST, Maze.SOUTH });
+        int[] directions = (maze.type == Maze.HEX ? new int[]{ Maze.NORTHEAST, Maze.EAST, Maze.SOUTHEAST, Maze.SOUTHWEST, Maze.WEST, Maze.NORTHWEST } : new int[]{ Maze.NORTH, Maze.EAST, Maze.SOUTH, Maze.WEST });
+        int value = rand.nextInt(directions.length);
         /** Implementation **/
-        for (int i = 0; i < directions.length; i++) {
+        for (int i = value; i < directions.length; i++) {
+            System.out.printf("Checking Direction (%d) [Iteration %d]\n", directions[i], i);
+            if (checkDirection(maze, position, directions, i, visited))
+                return directions[i];
+        }
+        for (int i = 0; i < value; i++) {
             System.out.printf("Checking Direction (%d) [Iteration %d]\n", directions[i], i);
             if (checkDirection(maze, position, directions, i, visited))
                 return directions[i];
