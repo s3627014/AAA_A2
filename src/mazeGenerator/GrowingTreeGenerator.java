@@ -12,14 +12,19 @@ import static maze.Maze.SOUTHWEST;
 
 public class GrowingTreeGenerator implements MazeGenerator {
 	// Growing tree maze generator. As it is very general, here we implement as "usually pick the most recent cell, but occasionally pick a random cell"
-	
+	//This value can be changed to determine how often a cell is picked randomly or most recently.
 	double threshold = 0.1;
 
 	@Override
+
 	public void generateMaze(Maze maze) {
+		//Creates a random instance to be used for selecting random indexes from a list
 		Random random = new Random();
+		//z is the list of Cells that will be used for growing tree to select from.
 		ArrayList<Cell> z = new ArrayList<>();
+		//visited is a list of cells that have been visited.
 		ArrayList<Cell> visited = new ArrayList<>();
+		//List of directions. If Hex map more directions are added.
 		ArrayList<Integer> directions = new ArrayList<>(Arrays.asList(NORTH, EAST, SOUTH, WEST));
 		if (maze.type == HEX) {
 			directions.add(NORTHEAST);
@@ -27,63 +32,70 @@ public class GrowingTreeGenerator implements MazeGenerator {
 			directions.add(SOUTHEAST);
 			directions.add(SOUTHWEST);
 		}
+		//Calulcates a random starting position.
 		Cell startingPoint;
+		//If normal maze, select a random cell inside the bounds.
 		if (maze.type == NORMAL) {
 			startingPoint = maze.map[random.nextInt(maze.sizeR)][random.nextInt(maze.sizeC)];
-
+		//If Hex maze, starting point is calulated according to the FAQ notes.
 		} else {
 			int r = random.nextInt(maze.sizeR);
-			int rValue = (int) Math.ceil((double) r / 2) + maze.sizeC;
-			int c =0;
-
-
-
-			if(r==0){
-				c= random.nextInt(maze.sizeC);
+			//cBoundValue is calculated after the row has been selected using the formula given in the FAQ notes.
+			int cBoundValue = (int) Math.ceil((double) r / 2) + maze.sizeC;
+			int c;
+			//If row is not even then -1 to the bounds of C.
+			if (r % 2 != 0) {
+				cBoundValue = cBoundValue - 1;
 			}
-			else {
-				if(r %2 ==0){
-					c = rValue-1;
-				}
-				else{
-					c = rValue-2;
-				}
-
-			}
-			System.out.println("r is " + r + "  c is " + c);
+			//Select a c value from the calculated bounds
+			c = random.nextInt(cBoundValue);
 			startingPoint = maze.map[r][c];
 
 		}
 		z.add(startingPoint);
 		visited.add(startingPoint);
 		Cell current;
+		//While z list is not empty, select a cell from the list and run it through the growing tree algorithm.
 		while(!z.isEmpty()){
 			if(random.nextDouble() > threshold){
+				//Selects random cell from list.
 				current = z.get(random.nextInt(z.size()));
 			}
 			else{
+				//Selects the last cell from the list.
 				current = z.get(z.size()-1);
 			}
-			System.out.println("picked from z: " + current.r + "," + current.c);
+			//List of neighs of the current cell
 			ArrayList<Cell> neighs = getTheNeighbours(directions,maze,current,visited);
+			//If current has no neighbours then remove it from z.
 			if(neighs.isEmpty()){
 				z.remove(current);
 			}
+			//selects one of the found neighbours and deletes the wall between current and neighCell.
 			else{
 				Cell neighCell = neighs.get(random.nextInt(neighs.size()));
 				deleteWall(directions,maze,neighCell,current);
+				//Add the neighCell to both z and visited.
 				z.add(neighCell);
 				visited.add(neighCell);
 			}
-		System.out.println(z.size());
+			//Clear the neigh list for next iteration.
 			neighs.clear();
 		}
 
 	}
+	/**
+	 * Find valid neighbours of a cell.
+	 *
+	 * @param maze       is the maze we are constructing
+	 * @param directions is the list of directions.
+	 * @param cell       is the cell in the maze for which we are finding neighbours.
+	 * @param visited    is the list of visited cells.
+	 */
 	public ArrayList<Cell> getTheNeighbours(ArrayList<Integer> directions, Maze maze, Cell cell, ArrayList<Cell> visited) {
-		//Get the neighbours!
 		ArrayList<Cell> neighs = new ArrayList<>();
 		int i = 0;
+		//Find all valid neighbours of the cell.
 		while (i < directions.size()) {
 			try {
 				if (maze.map[cell.r + deltaR[directions.get(i)]][cell.c + deltaC[directions.get(i)]] != null) {
@@ -100,23 +112,30 @@ public class GrowingTreeGenerator implements MazeGenerator {
 			i++;
 		}
 
-
+		//Remove all neighs that have been visited already
 		i = 0;
 		while (i < neighs.size()) {
 			if (visited.contains(neighs.get(i))) {
 				neighs.remove(i);
 				continue;
 			}
-			System.out.println("Neighs are: " + neighs.get(i).r + "," + neighs.get(i).c);
 			i++;
 		}
 		return neighs;
 	}
-
+	/**
+	 * Deletes the wall between cell a and b.
+	 *
+	 * @param maze       is the maze we are constructing
+	 * @param directions is the list of directions.
+	 * @param a          is a cell on the maze adjacent to b.
+	 * @param b          is a cell on the maze adjacent to a.
+	 */
 	public void deleteWall(ArrayList<Integer> directions, Maze maze, Cell a, Cell b) {
 		System.out.println("Deleting wall between " + a.r + "," + a.c + " and " + b.r + "," + b.c);
 		int i = 0;
 		Cell tempCell;
+		//Finds the correct direction to delete a wall from.
 		while (i < directions.size()) {
 			try {
 				tempCell = maze.map[a.r + deltaR[directions.get(i)]][a.c + deltaC[directions.get(i)]];
@@ -131,13 +150,6 @@ public class GrowingTreeGenerator implements MazeGenerator {
 		}
 
 	}
-	public void stop() {
-		try {
-			System.in.read();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 
-	}
 
 }
