@@ -36,6 +36,12 @@ public class WallFollowerSolver implements MazeSolver {
 				maze.drawFtPrt(currentPosition);
 				visited.add(currentPosition);
 			}
+			//Checks to see if cell was a tunnel, if so tunnel through that bad boy!
+			if(currentPosition.tunnelTo !=null && !visited.contains(currentPosition.tunnelTo)){
+				currentPosition = currentPosition.tunnelTo;
+				maze.drawFtPrt(currentPosition);
+				visited.add(currentPosition);
+			}
 			// Check if we've reached the exit
 			if (currentPosition == maze.exit) {
 				solved = true;
