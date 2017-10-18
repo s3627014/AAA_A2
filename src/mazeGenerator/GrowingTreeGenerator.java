@@ -102,7 +102,6 @@ public class GrowingTreeGenerator implements MazeGenerator {
 					if ((neighs.contains(maze.map[cell.r + deltaR[directions.get(i)]][cell.c + deltaC[directions.get(i)]]))) {
 					} else {
 						neighs.add(maze.map[cell.r + deltaR[directions.get(i)]][cell.c + deltaC[directions.get(i)]]);
-						//System.out.println("Adding cell " + maze.map[cell.r + deltaR[directions.get(i)]][cell.c + deltaC[directions.get(i)]].r + "," + maze.map[cell.r + deltaR[directions.get(i)]][cell.c + deltaC[directions.get(i)]].c);
 
 					}
 				}
@@ -132,7 +131,6 @@ public class GrowingTreeGenerator implements MazeGenerator {
 	 * @param b          is a cell on the maze adjacent to a.
 	 */
 	public void deleteWall(ArrayList<Integer> directions, Maze maze, Cell a, Cell b) {
-		System.out.println("Deleting wall between " + a.r + "," + a.c + " and " + b.r + "," + b.c);
 		int i = 0;
 		Cell tempCell;
 		//Finds the correct direction to delete a wall from.
